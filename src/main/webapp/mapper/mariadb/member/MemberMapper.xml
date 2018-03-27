@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyinsoft.common.sql.MemberMapper">
+	<insert id="insert" parameterType="hashmap">
+		insert into MEMBER (
+			NAME, PWD, DEPT, CLASSES, GENDER
+		) values (
+			#{name}, #{pwd}, #{dept}, #{classes}, #{gender}
+		)
+	</insert>
+	
+	<select id="login" parameterType="hashmap" resultType="hashmap">
+		select NO
+		from MEMBER
+		where NAME = #{name}
+		and PWD = #{pwd}
+	</select>
+	
+	<select id="memberOne" parameterType="int" resultType="hashmap">
+		select NO, NAME, DEPT, CLASSES, GENDER
+		from MEMBER
+		where NO = #{value} 
+	</select>
+	
+	<update id="update" parameterType="hashmap">
+		update MEMBER
+		<set>
+			NAME = #{name},
+			GENDER = #{gender},
+			CLASSES = #{classes},
+			DEPT = #{dept},
+		</set>
+		where NO = #{no}
+	</update>
+</mapper>

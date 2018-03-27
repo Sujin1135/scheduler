@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:mvc="http://www.springframework.org/schema/mvc"
+   xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:util="http://www.springframework.org/schema/util"
+   xmlns:mybatis="http://mybatis.org/schema/mybatis-spring"
+   xmlns:tx="http://www.springframework.org/schema/tx"
+   xmlns:jee="http://www.springframework.org/schema/jee"
+   xmlns:aop="http://www.springframework.org/schema/aop"
+   xmlns:task="http://www.springframework.org/schema/task"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans
+                       http://www.springframework.org/schema/beans/spring-beans.xsd
+                       http://www.springframework.org/schema/mvc
+                       http://www.springframework.org/schema/mvc/spring-mvc.xsd
+                       http://www.springframework.org/schema/context
+                       http://www.springframework.org/schema/context/spring-context.xsd
+                       http://www.springframework.org/schema/util
+                       http://www.springframework.org/schema/util/spring-util.xsd
+                       http://mybatis.org/schema/mybatis-spring
+                       http://mybatis.org/schema/mybatis-spring.xsd
+                       http://www.springframework.org/schema/tx
+                       http://www.springframework.org/schema/tx/spring-tx.xsd
+                       http://www.springframework.org/schema/aop
+                       http://www.springframework.org/schema/aop/spring-aop.xsd
+                       http://www.springframework.org/schema/task
+                       http://www.springframework.org/schema/task/spring-task.xsd
+                       http://www.springframework.org/schema/jee
+                       http://www.springframework.org/schema/jee/spring-jee.xsd">
+  
+  <mvc:annotation-driven />
+	
+  <context:component-scan base-package="com.manyinsoft" />
+  
+  <bean id="dataSourceSpied" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+    <property name="driverClassName" value="org.mariadb.jdbc.Driver"/>
+    <property name="url" value="jdbc:mariadb://localhost:3306/calendar"/>
+    <property name="username" value="mingyu"/>
+    <property name="password" value="rkdwnd1135"/>
+    <property name="maxActive" value="30"/>
+    <property name="maxIdle" value="10"/>
+    <property name="maxWait" value="10"/>
+    <property name="validationQuery" value="select 1"/>
+    <property name="testWhileIdle" value="true"/>
+    <property name="timeBetweenEvictionRunsMillis" value="7200000"/>
+  </bean>
+
+  <bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+    <constructor-arg ref="dataSourceSpied" />
+    <property name="logFormatter">
+      <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+        <property name="loggingType" value="MULTI_LINE"/>
+        <property name="sqlPrefix" value="SQL : "/>
+      </bean>
+    </property>
+  </bean>
+
+  <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource"/>
+    <property name="configLocation" value="/WEB-INF/config/mybatis/mybatis.xml"/>
+    <property name="mapperLocations">
+      <array>
+        <value>/mapper/mariadb/**/*.xml</value>
+      </array>
+    </property>
+  </bean>
+
+  <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+    <constructor-arg ref="sqlSessionFactory"/>
+  </bean>
+
+  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <property name="dataSource" ref="dataSource"/>
+  </bean>
+
+  <tx:annotation-driven proxy-target-class="true"/>
+  
+  <tx:advice id="txAdvice" transaction-manager="transactionManager">
+    <tx:attributes>
+      <tx:method name="*" rollback-for="Exception"/>
+      <tx:method name="count*" read-only="true"/>
+      <tx:method name="search*" read-only="true"/>
+      <tx:method name="list*" read-only="true"/>
+      <tx:method name="select*" read-only="true"/>
+    </tx:attributes>  
+  </tx:advice>
+
+  <aop:aspectj-autoproxy/>
+  
+  <aop:config>
+    <aop:pointcut id="pointcut" expression="bean(*Service)"/>
+    <aop:advisor id="advisor" pointcut-ref="pointcut" advice-ref="txAdvice"/>
+  </aop:config>  
+
+  <task:scheduler id="annotationbatchSecheduler" pool-size="1"/>
+
+  <task:annotation-driven scheduler="annotationbatchSecheduler"/>
+</beans>
