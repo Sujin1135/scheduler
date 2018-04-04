@@ -1,6 +1,7 @@
 package com.manyinsoft.member.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -29,6 +30,7 @@ public class MemberController {
 	// 회원가입폼
 	@RequestMapping(value="/member/createView", method=RequestMethod.GET)
 	public String memberCreateView () {
+		if (session.getAttribute("member") != null) return "/sample/sampleListView";
 		return "/member/memberCreateView";
 	}
 	
@@ -60,6 +62,7 @@ public class MemberController {
 	// 회원정보 수정폼
 	@RequestMapping(value="/member/updateView", method=RequestMethod.GET)
 	public String memberUpdateView() {
+		if (session.getAttribute("member") == null) return "/member/memberLoginView";
 		return "/member/memberUpdateView";
 	}
 	
@@ -81,6 +84,7 @@ public class MemberController {
 	// 로그인폼
 	@RequestMapping(value="/member/loginView", method=RequestMethod.GET)
 	public String memberLoginView() {
+		if (session.getAttribute("member") != null) return "/sample/sampleListView";
 		return "/member/memberLoginView";
 	}
 	
@@ -90,13 +94,20 @@ public class MemberController {
 	public HashMap<String, Object> loginMember (@RequestParam HashMap<String, Object> requestParam) {
 		HashMap<String, Object> resultMap = new HashMap<String, Object>();
 		
-		try {
+		int result = memberService.loginMember(requestParam);
+		
+		if (result > 0) {
+			// 로그인 성공
 			session.setAttribute("member", memberService.loginMember(requestParam));
 			resultMap.put("result", "SUCCESS");
-		} catch (Exception e) {
-			resultMap.put("result", "FAIL");
-			resultMap.put("errMsg", e.getMessage());
+		} else if (result == -1) {
+			// 아이디가 다를경우
+			resultMap.put("result", "IDFAIL");
+		} else if (result == 0) {
+			// 비밀번호가 다를경우
+			resultMap.put("result", "PWDFAIL");
 		}
+		
 		return resultMap;
 	}
 	
@@ -108,7 +119,6 @@ public class MemberController {
 		
 		try {
 			resultMap = memberService.memberOne(no);
-			System.out.println(resultMap.get("NAME"));
 			resultMap.put("result", "SUCCESS");
 		} catch (Exception e) {
 			resultMap.put("errMsg", e.getMessage());
@@ -121,18 +131,27 @@ public class MemberController {
 	@ResponseBody
 	@RequestMapping(value="/member/logoutMember", method=RequestMethod.GET)
 	public HashMap<String, Object> logoutMember () {
-		System.out.println("logOut");
 		HashMap<String, Object> resultMap = new HashMap<String, Object>();
 	
 		if (session.getAttribute("member") != null) {
 			session.removeAttribute("member");
 			resultMap.put("result", "SUCCESS");
-			System.out.println("SUCCESS");
 		} else {
 			System.out.println("FAIL");
 			resultMap.put("result", "FAIL");
 		}
 		
+		return resultMap;
+	}
+	
+	// 멤버 이름으로 조회
+	@ResponseBody
+	@RequestMapping(value="/member/searchMember", method=RequestMethod.GET)
+	public HashMap<String, Object> searchMember (@RequestParam HashMap<String, Object> requestParam) {
+		List<HashMap<String, Object>> memberList = memberService.searchMember(requestParam);
+		HashMap<String, Object> resultMap = new HashMap<String, Object>();
+		
+		resultMap.put("memberList", memberList);
 		return resultMap;
 	}
 }

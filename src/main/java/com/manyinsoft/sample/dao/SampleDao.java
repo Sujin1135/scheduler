@@ -28,6 +28,11 @@ public class SampleDao {
 		return sqlSession.selectOne("com.manyinsoft.common.sql.SampleMapper.selectSample", selectMap);
 	}
 	
+	// 게시글 작성자 번호조회
+	public HashMap<String, Integer> sampleMemberNo(int no) {
+		return sqlSession.selectOne("com.manyinsoft.common.sql.SampleMapper.sampleMemberNo", no);
+	}
+	
 	// 수정
 	public int updateSample(HashMap<String, Object> hashMap) {
 		return sqlSession.update("com.manyinsoft.common.sql.SampleMapper.updateSample", hashMap);
@@ -36,5 +41,25 @@ public class SampleDao {
 	// 삭제
 	public int deleteSample(HashMap<String, Object> hashMap) {
 		return sqlSession.update("com.manyinsoft.common.sql.SampleMapper.deleteSample", hashMap);
+	}
+	
+	// 일정 참여멤버 등록
+	public int insertSampleMember(HashMap<String, Integer> hashMap) {
+		return sqlSession.update("com.manyinsoft.common.sql.SamplePartyMapper.addMember", hashMap);
+	}
+	
+	// 일정 참여맴버 목록
+	public List<HashMap<String, Object>> selectPartyMember (int no) {
+		return sqlSession.selectList("com.manyinsoft.common.sql.SamplePartyMapper.samplePartyMember", no);
+	}
+	
+	// 일정멤버 삭제
+	public int deleteSampleMember (HashMap<String, Integer> hashMap) {
+		return sqlSession.update("com.manyinsoft.common.sql.SamplePartyMapper.deleteMember", hashMap);
+	}
+	
+	// 멤버의 일정 및 멤버가 참여한 일정정보를 가져온다
+	public List<HashMap<String, Object>> mySamples (HashMap<String, Object> hashMap) {
+		return sqlSession.selectList("com.manyinsoft.common.sql.SamplePartyMapper.mySamples", hashMap);
 	}
 }

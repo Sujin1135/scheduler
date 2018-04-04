@@ -3,23 +3,45 @@
 <mapper namespace="com.manyinsoft.common.sql.MemberMapper">
 	<insert id="insert" parameterType="hashmap">
 		insert into MEMBER (
-			NAME, PWD, DEPT, CLASSES, GENDER
-		) values (
-			#{name}, #{pwd}, #{dept}, #{classes}, #{gender}
+			NAME, EMAIL, PWD, DEPT, CLASSES, GENDER
 		)
+		select #{name}, #{email}, #{pwd}, #{dept}, #{classes}, #{gender} from DUAL
+		where not exists (select NO from MEMBER where EMAIL = #{email})
 	</insert>
 	
 	<select id="login" parameterType="hashmap" resultType="hashmap">
-		select NO
+		select (SELECT EMAIL
+	          from MEMBER 
+	         where EMAIL = #{email}
+	           AND PWD = #{pwd}) AS PW_VALID_CHECK
+	         , NO
+		from MEMBER as A
+		where EMAIL = #{email}
+	</select>
+	
+	<select id="searchMember" parameterType="hashmap" resultType="hashmap">
+		select NO, NAME, EMAIL, DEPT, CLASSES, GENDER
 		from MEMBER
-		where NAME = #{name}
-		and PWD = #{pwd}
+		<choose>
+			<when test="type == 'name'">
+				where NAME = #{name}
+			</when>
+			
+			<when test="type == 'dept'">
+				where DEPT = #{name}
+			</when>
+			
+			<when test="type == 'classes'">
+				where CLASSES = #{name}
+			</when>
+		</choose>
+		and NO != ${writer}
 	</select>
 	
 	<select id="memberOne" parameterType="int" resultType="hashmap">
-		select NO, NAME, DEPT, CLASSES, GENDER
+		select NO, NAME, EMAIL, DEPT, CLASSES, GENDER
 		from MEMBER
-		where NO = #{value} 
+		where NO = #{value}
 	</select>
 	
 	<update id="update" parameterType="hashmap">

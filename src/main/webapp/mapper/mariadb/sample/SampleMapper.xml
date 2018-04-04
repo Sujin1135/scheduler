@@ -3,11 +3,14 @@
 
 <mapper namespace="com.manyinsoft.common.sql.SampleMapper">
   <select id="searchSample" resultType="hashMap" parameterType="hashMap">
-    select S.SEQ as id,
-           S.SEQ,
-           S.TITLE,
-           S.CONTENT,
-           S.TYPE,
+    select SEQ as id,
+           SEQ,
+           MEMBER_NO,
+           TITLE,
+           CONTENT,
+           TYPE,
+           START_DATE,
+           END_DATE,
            M.NAME
       from SAMPLE as S
       left join MEMBER as M
@@ -30,8 +33,10 @@
     </if>
      order by SEQ desc;
   </select>
-  <insert id="insertSample" parameterType="hashMap">
+  
+  <insert id="insertSample" parameterType="hashMap" useGeneratedKeys="true">
     insert into SAMPLE (
+      SEQ,
       TITLE,
       CONTENT,
       TYPE,
@@ -41,6 +46,7 @@
       DELETE_AT
       )
     values (
+      #{SEQ, jdbcType=INTEGER},
       #{TITLE,jdbcType=VARCHAR},
       #{CONTENT,jdbcType=VARCHAR},
       #{TYPE,jdbcType=INTEGER},
@@ -49,8 +55,8 @@
       #{MEMBERNO,jdbcType=INTEGER},
       'N'
       )
-    <selectKey keyProperty="SEQ" resultType="int" order="AFTER">
-      select LAST_INSERT_ID() 
+    <selectKey keyProperty="SEQ" resultType="long" order="AFTER">
+      select LAST_INSERT_ID()
     </selectKey>
   </insert>
   
@@ -72,7 +78,13 @@
       left join MEMBER as M
       on MEMBER_NO = M.NO
       </if>
-     where SEQ = #{SEQ,jdbcType=INTEGER}
+     where SEQ = #{SEQ, jdbcType=INTEGER}
+  </select>
+  
+  <select id="sampleMemberNo" resultType="hashMap" parameterType="int">
+  	select MEMBER_NO
+  	from SAMPLE
+  	where SEQ = #{SEQ, jdbcType=INTEGER}
   </select>
   
   <update id="updateSample" parameterType="hashMap">
@@ -84,9 +96,10 @@
 	       END_DATE = #{ENDDATE,jdbcType=DATE}
      where SEQ = #{SEQ,jdbcType=INTEGER}
   </update>
+  
   <update id="deleteSample" parameterType="hashMap">
     update SAMPLE
        set DELETE_AT = 'Y'
-     where SEQ = #{SEQ,jdbcType=INTEGER}
+     where SEQ = #{seq,jdbcType=INTEGER}
   </update>
 </mapper>

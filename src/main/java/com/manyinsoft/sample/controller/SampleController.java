@@ -1,8 +1,8 @@
 package com.manyinsoft.sample.controller;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,25 +41,29 @@ public class SampleController {
 	// 비동기 통신을 하는 RequestMapping
 	@ResponseBody
 	@RequestMapping(value = "/sample/searchSample.do", method = RequestMethod.POST)
-	public HashMap<String, Object> searchSample(@RequestParam HashMap<String, Object> requestParam) throws Exception {
+	public HashMap<String, Object> searchSample(HttpServletRequest request, @RequestParam HashMap<String, Object> requestParam) throws Exception {
 		
 		// key값이 likeTitle로 넘어온 값을 받아서 likeTitle에 저장한다.
 		String likeTitle = (String) requestParam.get("likeTitle");
+		String contextPath = request.getContextPath();
 		
 		HashMap<String, Object> searchMap = new HashMap<String, Object>();
-		System.out.println("calenderSelect: " + requestParam.get("calendarSelect"));
+		
 		// likeTitle이 값이 있을때
 		if(likeTitle != null && !"".equals(likeTitle)){
 			searchMap.put("LIKE_TITLE", "%" + likeTitle.toUpperCase() + "%");
 		}
+		
 		searchMap.put("TYPE_SELECT", requestParam.get("typeSelect"));
 		searchMap.put("CALENDAR_SELECT", requestParam.get("calendarSelect"));
+		searchMap.put("start", requestParam.get("start"));
+		searchMap.put("end", requestParam.get("end"));
 		
 		// 결과정보를 저장할 HashMap
 		HashMap<String, Object> responseBody = new HashMap<String, Object>();
-		
+
 		// 조회 목록을 저장할 List
-		List<HashMap<String, Object>> sampleList = sampleService.searchSample(searchMap);
+		List<HashMap<String, Object>> sampleList = sampleService.searchSample(searchMap, contextPath);
 		
 		// 반환할 HashMap에 결과 List 저장
 		responseBody.put("sampleList", sampleList);
@@ -76,8 +81,8 @@ public class SampleController {
 	// 게시물 등록
 	@ResponseBody
 	@RequestMapping(value = "/sample/insertSample.do", method = RequestMethod.POST)
-	public HashMap<String, Object> insertSample(@RequestParam HashMap<String, Object> requestParam){
-		HashMap<String, Object> resultMap = new HashMap<String, Object>();
+	public HashMap<String, Object> insertSample(@RequestBody HashMap<String, Object> requestParam){
+		 HashMap<String, Object> resultMap = new HashMap<String, Object>();
 		
 		try{
 			sampleService.insertSample(requestParam);
@@ -88,45 +93,87 @@ public class SampleController {
 		}
 
 		return resultMap;
-	}	
+	}
+	
+	// 내 일정
+	@RequestMapping(value = "/sample/mySamplesView", method = RequestMethod.GET)
+	public String mySamplesView (@RequestParam("seq") int seq) {
+		int memberNo = Integer.parseInt(session.getAttribute("member").toString());
+		if (memberNo != seq) return "/sample/sampleListView";
+		return "/sample/mySamplesView";
+	}
+	
+	// 내 일정 받아오기
+	@ResponseBody
+	@RequestMapping(value = "/sample/mySamples.do", method = RequestMethod.POST)
+	public List<HashMap<String, Object>> mySamples (HttpServletRequest request, @RequestParam HashMap<String, Object> requestParam) {
+		String contextPath = request.getContextPath();
+		List<HashMap<String, Object>> sampleList = sampleService.mySamples(requestParam, contextPath);
+		System.out.println(sampleList);
+		return sampleList;
+	}
+	
+	// 달력으로 보기
+	@RequestMapping(value = "/sample/sampleCalendarView", method=RequestMethod.GET)
+	public String sampleCalendar() {
+		if (session.getAttribute("member") == null) return "/member/memberLoginView";
+		return "/sample/sampleCalendarView";
+	}
+	
+	// 게시물 상세보기
+	@RequestMapping(value="/sample/sampleOneView", method=RequestMethod.GET)
+	public String sampleOneView() {
+		if (session.getAttribute("member") == null) return "/member/memberLoginView";
+		return "/sample/sampleOneView";
+	}
 	
 	// 게시물 수정화면
 	@RequestMapping(value = "/sample/sampleUpdateView", method = RequestMethod.GET)
-	public String scrinDetailView(HttpServletRequest request) {
+	public String scrinDetailView(HttpServletRequest request, @RequestParam("seq") int seq) {
+		// 비로그인자가 접근할경우 방지
 		if (session.getAttribute("member") == null) return "/member/memberLoginView";
+		int sampleMemberNo = sampleService.sampleMemberNo(seq);
+		int memberNo = Integer.parseInt(session.getAttribute("member").toString());
+		
+		// 해당 글작성자 이외의 다른 멤버가 수정권한에 접근할 경우를 방지
+		if (memberNo != sampleMemberNo) return "sample/sampleListView";
 		return "sample/sampleUpdateView";
 	}
 	
-	@RequestMapping(value = "/sample/sampleOneView", method = RequestMethod.GET)
-	public String scrinOneView() {
-		if (session.getAttribute("member") == null) return "/member/memberLoginView";
-		return "sample/sampleOneView";
+	// 게시물 수정
+	@ResponseBody
+	@RequestMapping(value = "/sample/selectSample.do", method = RequestMethod.POST)
+	public HashMap<String, Object> scrinUpdateView(HttpServletRequest request, @RequestParam HashMap<String, Object> requestParam) {
+		HashMap<String, Object> responseBody = new HashMap<String, Object>();
+		String contextPath = request.getContextPath();
+		
+		responseBody.put("sampleList", sampleService.selectSample(requestParam, contextPath));
+		return responseBody;
 	}
 	
 	// 게시물 상세보기
 	@ResponseBody
-	@RequestMapping(value = "/sample/selectSample.do", method = RequestMethod.POST)
+	@RequestMapping(value = "/sample/oneSample.do", method=RequestMethod.POST)
 	public HashMap<String, Object> scrinDetailView(HttpServletRequest request, @RequestParam HashMap<String, Object> requestParam) {
-		
 		HashMap<String, Object> responseBody = new HashMap<String, Object>();
+		String contextPath = request.getContextPath();
 		
-		responseBody.put("sample", sampleService.selectSample(requestParam));
-				
+		// 쿼리 실행결과를 받아온다
+		responseBody.put("sampleList", sampleService.selectSample(requestParam, contextPath));
+		
 		return responseBody;
 	}
 	
 	// 게시물 수정
 	@ResponseBody
 	@RequestMapping(value = "/sample/updateSample.do", method = RequestMethod.POST)
-	public HashMap<String, Object> updateSample(@RequestParam HashMap<String, Object> requestParam) {
+	public HashMap<String, Object> updateSample(@RequestBody HashMap<String, Object> requestParam) {
 		HashMap<String, Object> resultMap = new HashMap<String, Object>();
-		
 		try{
-			Map<String, Object> member = (HashMap<String, Object>)session.getAttribute("member");
-			int sessionNo = Integer.parseInt(member.get("NO").toString());
+			int sessionNo = Integer.parseInt(session.getAttribute("member").toString());
 			int requestNo = Integer.parseInt(requestParam.get("MEMBERNO").toString());
-			System.out.println(sessionNo);
-			System.out.println(requestNo);
+			
+			// 글 작성자의 pk와 현재 로그인한 멤버의 pk 정보가 다를경우
 			if (sessionNo != requestNo) throw new Exception("멤버 정보가 다름");
 			sampleService.updateSample(requestParam);
 			
@@ -148,14 +195,10 @@ public class SampleController {
 		try{
 			if (session.getAttribute("member") == null) throw new Exception("비로그인 상태");
 			
-			String sampleList = (String) requestParam.get("sampleList");
-			
-			ObjectMapper objectMapper = new ObjectMapper();
-			
-			HashMap<String, Object> deleteMap = new HashMap<String, Object>();
-			deleteMap.put("sampleList", objectMapper.readValue(sampleList, List.class));
-			
-			sampleService.deleteSample(deleteMap);
+			int memberNo = Integer.parseInt(requestParam.get("memberNo").toString());
+			int sessionMemberNo = Integer.parseInt(session.getAttribute("member").toString());
+			if (memberNo != sessionMemberNo) throw new Exception("사용자 정보가 다름");
+			sampleService.deleteSample(requestParam);
 			
 			resultMap.put("result", "SUCCESS");
 		}catch(Exception e){
@@ -164,5 +207,12 @@ public class SampleController {
 		}
 		
 		return resultMap;
+	}
+	
+	// 해당 일정에 참여하는 멤버조회
+	@ResponseBody
+	@RequestMapping(value = "/sample/partyMember.do", method= RequestMethod.POST)
+	public List<HashMap<String, Object>> selectPartyMember (@RequestParam("no") int no) {
+		return sampleService.selectPartyMember(no);
 	}
 }

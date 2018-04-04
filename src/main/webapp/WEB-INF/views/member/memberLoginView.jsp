@@ -5,28 +5,22 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		
-		<link href="${pageContext.request.contextPath}/resources/webix/webix.css" rel="stylesheet" type="text/css" />
-		<link href="${pageContext.request.contextPath}/resources/webix/skins/compact.css" rel="stylesheet" type="text/css" />
-		<script src="${pageContext.request.contextPath}/resources/webix/webix.js" type="text/javascript"></script>
-		<script src="${pageContext.request.contextPath}/resources/jquery/jquery-3.3.1.min.js" type="text/javascript"></script>
-		<script src="${pageContext.request.contextPath}/resources/main.js"></script>
+		<jsp:include page="../head/head.jsp" />
 		
 		<title>로그인</title>
 		
 		<script type="text/javascript">
 			function doSubmit() {
-				var name = $$("name").getValue();
+				var email = $$("email").getValue();
 				
-				if (spaceCheck(name, "name", "이름을 입력하세요.")) return;
+				if (spaceCheck(email, "email", "이메일을 입력하세요.") == 0) return;
 				
 				var pwd = $$("pwd").getValue();
 				
-				if (spaceCheck(pwd, "pwd", "비밀번호를 입력하세요.")) return;
+				if (spaceCheck(pwd, "pwd", "비밀번호를 입력하세요.") == 0) return;
 				
-				var param = new Object();
-				param.name = name;
+				var param = {};
+				param.email = email;
 				param.pwd = pwd;
 				
 				$.ajax({
@@ -37,8 +31,10 @@
 					success: function(data) {
 						if (data.result == "SUCCESS") {
 							goBack("${pageContext.request.contextPath}/sample/sampleListView", "로그인 하였습니다.");
-						} else {
-							alert("아이디 혹은 비밀번호가 다릅니다.");
+						} else if (data.result == "IDFAIL") {
+							alert("아이디가 존재하지 않습니다.");
+						} else if (data.result == "PWDFAIL") {
+							alert ("비밀번호가 다릅니다.");
 						}
 					},
 					error: function(data) {
@@ -50,7 +46,15 @@
 	</head>
 
 	<body>
-		<div id="_login"></div>
+		<div class="article">
+			<div class="text-center">
+				<h1>로그인</h1>
+			</div>
+			
+			<div id="_login"></div>
+		</div>
+		
+		<jsp:include page="../footer/footer.jsp" />
 	
 		<script type="text/javascript">
 			webix.ready(function () {
@@ -66,7 +70,7 @@
 								view:"form",
 								width: 400,
 								rows:[
-									{view: "text", label:"이름", id:"name"},
+									{view: "text", type:"email", label:"이메일", id:"email"},
 									{view: "text", type:"password", label:"password", id:"pwd"},
 									{view: "button", label:"로그인", id:"submitButton"},
 									{view: "button", label:"회원가입", id:"joinButton"}
@@ -77,7 +81,7 @@
 					}
 				)
 				
-				enterSubmit("name");
+				enterSubmit("email");
 				enterSubmit("pwd");
 			
 				$$("submitButton").attachEvent("onItemClick", function(id, e) {

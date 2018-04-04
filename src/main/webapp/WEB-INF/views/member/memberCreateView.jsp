@@ -3,87 +3,68 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<title>회원 등록</title>
+		<jsp:include page="../head/head.jsp" />
 		
-		<link href="${pageContext.request.contextPath}/resources/webix/webix.css" rel="stylesheet" type="text/css" />
-		<link href="${pageContext.request.contextPath}/resources/webix/skins/compact.css" rel="stylesheet" type="text/css" />
-		<script src="${pageContext.request.contextPath}/resources/webix/webix.js" type="text/javascript"></script>
-		<script src="${pageContext.request.contextPath}/resources/jquery/jquery-3.3.1.min.js" type="text/javascript"></script>
-		<script src="${pageContext.request.contextPath}/resources/main.js"></script>
+		<title>회원 등록</title>
 		
 		<script type="text/javascript">
 			function doSubmit() {
 				
+				var email = $$("email").getValue();
+				// 이메일 공백확인
+				if (spaceCheck(email, "email", "이메일을 입력하세요.") == 0) return;
+				
 				var name = $$("name").getValue();
 				
 				// 이름 공백 확인
-				if (name == null || name == "" || name.length == 0 ) {
-					alert("이름을 입력하세요.");
-					$$("name").focus();
-					return;
-				}
+				if (spaceCheck(name, "name", "이름을 입력하세요.") == 0) return;
 				
 				var pwd = $$("pwd").getValue();
 				var pwdCheck = $$("pwdCheck").getValue();
 				
 				// 비밀번호 공백 확인
-				if (pwd == null || pwd == "" || pwd.length == 0) {
-					alert("비밀번호를 입력하세요.");
-					$$("pwd").focus();
-					return;
-				}
+				if (spaceCheck(pwd, "pwd", "비밀번호를 입력하세요") == 0) return;
 				
 				// 비밀번호확인 공백 확인
-				if (pwdCheck == null || pwdCheck == "" || pwdCheck.length == 0) {
-					alert("비밀번호 확인을 입력하세요.");
-					$$("pwdCheck").focus();
-					return;
-				}
+				if (spaceCheck(pwdCheck, "pwdCheck", "비밀번호 확인을 입력하세요.") == 0) return;
 				
+				// 비밀번호와 비밀번호 확인이 일치하는지
 				if (pwd != pwdCheck) {
 					alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
 					$$("pwd").focus();
 					$$("pwdCheck").focus();
 					return;
-				} 
+				}
 				
 				var dept = $$("dept").getValue();
 				
 				// 부서 선택여부 확인
-				if (dept == null || dept == "" || dept.length == 0) {
-					alert("부서를 선택해 주세요.");
-					$$("dept").focus();
-					return;
-				}
+				if (spaceCheck(dept, "dept", "부서를 선택하세요.") == 0);
 				
 				var classes = $$("classes").getValue();
 				
 				// 직급 선택여부 확인
-				if (classes == null || classes == "" || classes.length == 0) {
-					alert("직급을 선택해 주세요");
-					$$("classes").focus();
-					return;
-				}
+				if (spaceCheck(classes, "classes", "직급을 선택하세요.") == 0);
 				
 				var gender = $$("gender").getValue();
 				
 				// 성별 선택여부 확인
-				if (gender == null || gender == "" || gender.length == 0) {
-					alert("성별을 선택해 주세요");
-					$$("gender").focus();
-					return;
-				}
+				if (spaceCheck(gender, "gender", "성별을 선택하세요.") == 0);
 				
-				var param = new Object();
+				var param = {};
 				
 				param.name = name;
+				param.email = email;
 				param.pwd = pwd;
 				param.gender = gender;
 				param.dept = dept;
 				param.classes = classes;
 				
-				var result = new Object();
+				if (memberValidation(param)) {
+					return;
+				}
+				
+				var result = {};
 				
 				$.ajax({
 					url:"${pageContext.request.contextPath}/member/createMember.do",
@@ -107,8 +88,16 @@
 		</script>
 	</head>
 	<body>
-		<div id="_join"></div>
-	
+		<div class="article">
+			<div class="text-center">
+				<h1>회원가입</h1>
+			</div>
+			
+			<div id="_join"></div>
+		</div>
+		
+		<jsp:include page="../footer/footer.jsp" />
+		
 		<script type="text/javascript">
 		
 			webix.ready(function() {
@@ -123,6 +112,7 @@
 								id: "join",
 								width: 700,
 								rows:[
+									{ view:"text", type:"email", label: "이메일", id:"email"},
 									{ view:"text", label:"이름", id:"name"},
 									{ view:"text", type: "password", label: "비밀번호", id:"pwd"},
 									{ view:"text", type: "password", label: "비밀번호 확인", id:"pwdCheck"},
@@ -185,7 +175,16 @@
 							{}
 						]
 					}
-					);
+				);
+				
+				// 입력 태그에서 엔터키를 누를경우 submit되게
+				enterSubmit("email");
+				enterSubmit("name");
+				enterSubmit("pwd");
+				enterSubmit("pwdCheck");
+				enterSubmit("gender");
+				enterSubmit("classes");
+				enterSubmit("dept");
 				
 				$$("submitButton").attachEvent("onItemClick", function(id, e) {
 					doSubmit();

@@ -6,27 +6,21 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-		
-		<link href="${pageContext.request.contextPath}/resources/webix/webix.css" rel="stylesheet" type="text/css" />
-		<link href="${pageContext.request.contextPath}/resources/webix/skins/compact.css" rel="stylesheet" type="text/css" />
-		<script src="${pageContext.request.contextPath}/resources/webix/webix.js" type="text/javascript"></script>
-		<script src="${pageContext.request.contextPath}/resources/jquery/jquery-3.3.1.min.js" type="text/javascript"></script>
-		<script src="${pageContext.request.contextPath}/resources/main.js"></script>
+		<jsp:include page="../head/head.jsp" />
 		
 		<title>회원정보 관리</title>
 		
 		<script type="text/javascript">
 			function doSubmit() {
 				let name = trim("name");
-				if (spaceCheck(name, "name", "이름을 입력하세요.")) return;
+				if (spaceCheck(name, "name", "이름을 입력하세요.") == 0) return;
 				
-				let param = new Object();
+				let param = {};
 				param.name = name;
 				param.gender = $$("gender").getValue();
 				param.classes = $$("classes").getValue();
 				param.dept = $$("dept").getValue();
-				param.no = ${member.NO};
+				param.no = ${member};
 				
 				$.ajax({
 					url: "${pageContext.request.contextPath}/member/update.do",
@@ -51,9 +45,10 @@
 				$.ajax({
 					url: "${pageContext.request.contextPath}/member/memberOne",
 					type: "GET",
-					data: {"no": "${member.NO}"},
+					data: {"no": "${member}"},
 					success: function(data, status, xhr) {
 						if (data.result == "SUCCESS") {
+							$$("email").setValue(data.EMAIL);
 							$$("name").setValue(data.NAME);
 							$$("gender").setValue(data.GENDER);
 							$$("classes").setValue(data.CLASSES);
@@ -73,65 +68,77 @@
 	<body>
 		<jsp:include page="../navbar/sampleNavbar.jsp" />
 		
-		<div id="_updateForm">
-			<div style="text-align: center;">
+		<div class="article" style="margin-bottom: 15em;">
+			<div style="text-align: center; margin-bottom: 3em;" >
 				<h1>회원 정보</h1>
 			</div>
+		
+			<div id="_updateForm"></div>
 		</div>
+		
+		<jsp:include page="../footer/footer.jsp" />
+		
 		<script type="text/javascript">
 			webix.ready(function() {
 				webix.ui({
 					container: "_updateForm",
 					view: "layout",
-					rows: [
-						{view: "text", label: "이름", id: "name"},
-						{view: "radio", label: "성별", id: "gender", options: [
-							{"id": 1, "value": "남자"},
-							{"id": 2, "value": "여자"}
-						]},
+					cols: [
+						{},
 						{
-							view: "radio",
-							id: "classes",
-							label: "부서",
-							options: [
-								{"id": 1, "value": "사업"},
-								{"id": 2, "value": "개발"},
-								{"id": 3, "value": "경영"}
+							rows: [
+								{view: "text", type: "email", label: "이메일", id: "email", readonly: true},
+								{view: "text", label: "이름", id: "name"},
+								{view: "radio", label: "성별", id: "gender", options: [
+									{"id": 1, "value": "남자"},
+									{"id": 2, "value": "여자"}
+								]},
+								{
+									view: "radio",
+									id: "classes",
+									label: "부서",
+									options: [
+										{"id": 1, "value": "사업"},
+										{"id": 2, "value": "개발"},
+										{"id": 3, "value": "경영"}
+									]
+								},
+								{
+									view: "radio",
+									label: "직급",
+									id: "dept",
+									options: [
+										{"id": 1, "value": "인턴"},
+										{"id": 2, "value": "사원"},
+										{"id": 3, "value": "대리"},
+										{"id": 4, "value": "과장"},
+										{"id": 5, "value": "차장"},
+										{"id": 6, "value": "부장"},
+										{"id": 7, "value": "이사"},
+										{"id": 8, "value": "대표이사"}
+								]},
+								{
+									view: "layout",
+									cols: [
+										{},
+										{
+											view: "button",
+											id: "submitButton",
+											label: "등록",
+											width: 50
+										},
+										{
+											view: "button",
+											id: "cancelButton",
+											label: "이전",
+											width: 50
+										},
+										{}
+									]
+								}
 							]
 						},
-						{
-							view: "radio",
-							label: "직급",
-							id: "dept",
-							options: [
-								{"id": 1, "value": "인턴"},
-								{"id": 2, "value": "사원"},
-								{"id": 3, "value": "대리"},
-								{"id": 4, "value": "과장"},
-								{"id": 5, "value": "차장"},
-								{"id": 6, "value": "부장"},
-								{"id": 7, "value": "이사"},
-								{"id": 8, "value": "대표이사"}
-						]},
-						{
-							view: "layout",
-							cols: [
-								{},
-								{
-									view: "button",
-									id: "submitButton",
-									label: "등록",
-									width: 50
-								},
-								{
-									view: "button",
-									id: "cancelButton",
-									label: "이전",
-									width: 50
-								},
-								{}
-							]
-						}
+						{}
 					]
 				});
 				

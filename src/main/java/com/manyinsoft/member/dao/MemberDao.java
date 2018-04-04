@@ -1,6 +1,9 @@
 package com.manyinsoft.member.dao;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,5 +29,9 @@ public class MemberDao {
 	
 	public int updateMember (Map<String, Object> param) {
 		return sqlSession.update("com.manyinsoft.common.sql.MemberMapper.update", param);
+	}
+	
+	public List<HashMap<String, Object>> searchMember (Map<String, Object> param) {
+		return sqlSession.selectList("com.manyinsoft.common.sql.MemberMapper.searchMember", param);
 	}
 }

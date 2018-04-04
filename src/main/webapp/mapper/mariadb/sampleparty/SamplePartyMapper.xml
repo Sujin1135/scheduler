@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.manyinsoft.common.sql.SamplePartyMapper">
+  <insert id="addMember" parameterType="hashMap">
+  	insert into SAMPLEPARTY (
+  		SAMPLE_SEQ, MEMBER_NO, DELETE_AT
+  	)
+  	values (
+  		#{seq, jdbcType=INTEGER}, #{memberNo, jdbcType=INTEGER}, 'N'
+  	)
+  </insert>
+  
+  <select id="samplePartyMember" parameterType="int" resultType="hashmap">
+  	select MEMBER_NO, M.NAME, M.NO, M.DEPT, M.CLASSES, M.GENDER
+  	from SAMPLEPARTY
+  	left join MEMBER as M
+  	on MEMBER_NO = M.NO
+  	where DELETE_AT = 'N'
+  	and SAMPLE_SEQ = #{value, jdbcType=INTEGER}
+  </select>
+  
+  <update id="deleteMember" parameterType="hashMap">
+  	update SAMPLEPARTY 
+  	set DELETE_AT = 'Y'
+  	where SAMPLE_SEQ = #{SEQ, jdbcType=INTEGER}
+  	<if test="memberNo != null">
+  		and MEMBER_NO = #{memberNo, jdbcType=INTEGER}
+  	</if>
+  </update>
+  
+  <select id="sampleList" parameterType="int" resultType="hashmap">
+  	select SAMPLE_SEQ, S.TITLE, M.NAME, S.TYPE, S.CONTENT 
+  	from SAMPLEPARTY
+  	left join MEMBER as M
+  	on MEMBER_NO = M.NO
+  	left join SAMPLE as S
+  	on SAMPLE_SEQ = S.SEQ
+  	where MEMBER_NO = #{value}
+  </select>
+  
+  <select id="mySamples" parameterType="hashmap" resultType="hashmap">
+  	select SEQ, TITLE, M.NO, CONTENT, TYPE, START_DATE, END_DATE, M.NAME, MEMBER_NO
+	from SAMPLE
+	left join MEMBER as M
+	on MEMBER_NO = M.NO
+	where MEMBER_NO = #{memberNo}
+	union
+	select S.SEQ, S.TITLE, M.NO, S.CONTENT, S.TYPE, S.START_DATE, S.END_DATE, M.NAME, S.MEMBER_NO
+	from SAMPLEPARTY as P
+	left join SAMPLE as S
+	on P.MEMBER_NO = S.MEMBER_NO
+	left join MEMBER as M
+	on P.MEMBER_NO = M.NO
+	where SAMPLE_SEQ in (select SAMPLE_SEQ
+							from SAMPLEPARTY
+                            where MEMBER_NO = #{memberNo}
+                            );
+  </select>
+</mapper>
