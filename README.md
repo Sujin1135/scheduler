@@ -30,53 +30,53 @@
 ![회원가입](./img/스케줄러-회원가입.png)
 
 
-                공백체크 및 비밀번호 & 비밀번호 확인 일치여부 확인
-                “`
-                var email = $$("email").getValue();
-				// 이메일 공백확인
-				if (spaceCheck(email, "email", "이메일을 입력하세요.") == 0) return;
-				
-				var name = $$("name").getValue();
-				
-				// 이름 공백 확인
-				if (spaceCheck(name, "name", "이름을 입력하세요.") == 0) return;
-				
-				var pwd = $$("pwd").getValue();
-				var pwdCheck = $$("pwdCheck").getValue();
-				
-				// 비밀번호 공백 확인
-				if (spaceCheck(pwd, "pwd", "비밀번호를 입력하세요") == 0) return;
-				
-				// 비밀번호확인 공백 확인
-				if (spaceCheck(pwdCheck, "pwdCheck", "비밀번호 확인을 입력하세요.") == 0) return;
-				
-				// 비밀번호와 비밀번호 확인이 일치하는지
-				if (pwd != pwdCheck) {
-					alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
-					$$("pwd").focus();
-					$$("pwdCheck").focus();
-					return;
-				}
-				
-				var dept = $$("dept").getValue();
-				
-				// 부서 선택여부 확인
-				if (spaceCheck(dept, "dept", "부서를 선택하세요.") == 0);
-				
-				var classes = $$("classes").getValue();
-				
-				// 직급 선택여부 확인
-				if (spaceCheck(classes, "classes", "직급을 선택하세요.") == 0);
-				
-				var gender = $$("gender").getValue();
-				
-				// 성별 선택여부 확인
-				if (spaceCheck(gender, "gender", "성별을 선택하세요.") == 0);
+        //공백체크 및 비밀번호 & 비밀번호 확인 일치여부 확인
 
-                // 벨리데이션 체크 함수
-                if (memberValidation(param)) {
-					return;
-				}
+        var email = $$("email").getValue();
+        // 이메일 공백확인
+        if (spaceCheck(email, "email", "이메일을 입력하세요.") == 0) return;
+        
+        var name = $$("name").getValue();
+        
+        // 이름 공백 확인
+        if (spaceCheck(name, "name", "이름을 입력하세요.") == 0) return;
+        
+        var pwd = $$("pwd").getValue();
+        var pwdCheck = $$("pwdCheck").getValue();
+        
+        // 비밀번호 공백 확인
+        if (spaceCheck(pwd, "pwd", "비밀번호를 입력하세요") == 0) return;
+        
+        // 비밀번호확인 공백 확인
+        if (spaceCheck(pwdCheck, "pwdCheck", "비밀번호 확인을 입력하세요.") == 0) return;
+        
+        // 비밀번호와 비밀번호 확인이 일치하는지
+        if (pwd != pwdCheck) {
+            alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+            $$("pwd").focus();
+            $$("pwdCheck").focus();
+            return;
+        }
+        
+        var dept = $$("dept").getValue();
+        
+        // 부서 선택여부 확인
+        if (spaceCheck(dept, "dept", "부서를 선택하세요.") == 0);
+        
+        var classes = $$("classes").getValue();
+        
+        // 직급 선택여부 확인
+        if (spaceCheck(classes, "classes", "직급을 선택하세요.") == 0);
+        
+        var gender = $$("gender").getValue();
+        
+        // 성별 선택여부 확인
+        if (spaceCheck(gender, "gender", "성별을 선택하세요.") == 0);
+
+        // 벨리데이션 체크 함수
+        if (memberValidation(param)) {
+            return;
+        }
  
         위의 코드에 정의된 spaceCheck와 memberValidation 메서드
     
@@ -142,7 +142,6 @@
 
 ![일정목록](./img/스케줄러-일정목록.png)
 
-    “`
     <select id="searchSample" resultType="hashMap" parameterType="hashMap">
     select SEQ as id,
            SEQ,
@@ -174,7 +173,6 @@
     </if>
      order by SEQ desc;
     </select>
-  “`
 
   ##일정 등록
   자신의 일정에 관한 정보들을 입력받습니다.
@@ -186,7 +184,6 @@
 ![일정등록](./img/스케줄러-일정등록.png)
 ![멤버조회](./img/스케줄러-멤버조회.png)
 
-    “`
     // 추가된 멤버들을 담을 배열
     var addMemberArr = new Array();
 
@@ -230,7 +227,6 @@
 </ul>
 ![일정수정](./img/스케줄러-일정수정.png)
 
-    “`  
     // 초기 멤버배열
     var initializedMember = new Array();
     // 추가 멤버배열
@@ -418,7 +414,6 @@
 ![상세정보1](./img/스케줄러-상세정보1.png)
 ![상세정보2](./img/스케줄러-상세정보2.png)
 
-    “`  
         // 서블릿에서 풀캘린더가 바로 파싱할 수 있도록 키와 값을 설정한다
         // 게시글의 정보를 풀캘린더에서 바로 읽어들일 수 있도록 세팅한다
         private void sampleSettings (HashMap<String, Object> map, String contextPath) {
@@ -498,7 +493,6 @@
     <li>데이터를 삭제시키는게 아닌 일정 테이블의 DELETE_AT 컬럼을 'Y'값으로 변경한다.</li>
 </ul>
 
-    “`
     // 게시물 삭제
 	@ResponseBody
 	@RequestMapping(value = "/sample/deleteSample.do", method = RequestMethod.POST)
@@ -546,7 +540,6 @@
 
 ![내일정](./img/스케줄러-내일정.png)
 
-    “`
         <!-- 두개의 쿼리를 union을 사용하여 조합한 결과를 중복된 데이터 없이 보여준다 -->
         <select id="mySamples" parameterType="hashmap" resultType="hashmap">
         select SEQ, TITLE, M.NO, CONTENT, TYPE, START_DATE, END_DATE, M.NAME, MEMBER_NO
