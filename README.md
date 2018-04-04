@@ -26,11 +26,13 @@
     <li>이름은 2~10글자 이내로 한글 및 영문만 입력하게 하였습니다.</li>
     <li>비밀번호와 비밀번호 확인은 영문+숫자+특수문자 조합으로 8~16이내의 정보를 입력하지 않거나 둘의 값이 다를 경우 회원가입이 되지 않도록 하였습니다.</li>
 </ul>
+
 ![회원가입](./img/스케줄러-회원가입.png)
 
-공백체크 및 비밀번호 & 비밀번호 확인 일치여부 확인
- “`
-var email = $$("email").getValue();
+
+                공백체크 및 비밀번호 & 비밀번호 확인 일치여부 확인
+                “`
+                var email = $$("email").getValue();
 				// 이메일 공백확인
 				if (spaceCheck(email, "email", "이메일을 입력하세요.") == 0) return;
 				
@@ -75,9 +77,9 @@ var email = $$("email").getValue();
                 if (memberValidation(param)) {
 					return;
 				}
- “`
+ 
     위의 코드에 정의된 spaceCheck와 memberValidation 메서드
- “`
+ 
     // 공백여부 체크
     function spaceCheck(obj, objName, comment) {
         if(obj == null || obj == "" || obj.length == 0){
@@ -139,8 +141,8 @@ var email = $$("email").getValue();
 </ul>
 ![일정목록](./img/스케줄러-일정목록.png)
 
-“`
-<select id="searchSample" resultType="hashMap" parameterType="hashMap">
+    “`
+    <select id="searchSample" resultType="hashMap" parameterType="hashMap">
     select SEQ as id,
            SEQ,
            MEMBER_NO,
@@ -170,7 +172,7 @@ var email = $$("email").getValue();
     	and TYPE = #{CALENDAR_SELECT}
     </if>
      order by SEQ desc;
-  </select>
+    </select>
   “`
 
   ##일정 등록
@@ -182,7 +184,7 @@ var email = $$("email").getValue();
 ![일정등록](./img/스케줄러-일정등록.png)
 ![멤버조회](./img/스케줄러-멤버조회.png)
 
-“`
+    “`
     // 추가된 멤버들을 담을 배열
     var addMemberArr = new Array();
 
@@ -227,7 +229,7 @@ var email = $$("email").getValue();
 </ul>
 ![일정수정](./img/스케줄러-일정수정.png)
 
-“`  
+    “`  
     // 초기 멤버배열
     var initializedMember = new Array();
     // 추가 멤버배열
@@ -405,8 +407,8 @@ var email = $$("email").getValue();
     }
 “`
 
-##일정 상세정보
-일정 정보를 보여준다
+ ##일정 상세정보
+ 일정 정보를 보여준다
 
 <ul>
     <li>일정 기간과 일정명을 달력에 표출하고 클릭할 경우 상세 데이터를 나타낸다.</li>
@@ -416,10 +418,10 @@ var email = $$("email").getValue();
 ![상세정보1](./img/스케줄러-상세정보1.png)
 ![상세정보2](./img/스케줄러-상세정보2.png)
 
-“`  
-    // 서블릿에서 풀캘린더가 바로 파싱할 수 있도록 키와 값을 설정한다
-    // 게시글의 정보를 풀캘린더에서 바로 읽어들일 수 있도록 세팅한다
-	private void sampleSettings (HashMap<String, Object> map, String contextPath) {
+    “`  
+        // 서블릿에서 풀캘린더가 바로 파싱할 수 있도록 키와 값을 설정한다
+        // 게시글의 정보를 풀캘린더에서 바로 읽어들일 수 있도록 세팅한다
+        private void sampleSettings (HashMap<String, Object> map, String contextPath) {
 		// 풀캘린더에서 데이터를 읽어들일수 있게 값 세팅
 		map.put("id", map.get("SEQ"));
 		map.put("memberNo", map.get("MEMBER_NO"));
@@ -432,7 +434,7 @@ var email = $$("email").getValue();
 		map.put("name", map.get("NAME"));
 		map.put("type", map.get("TYPE"));
 		
-		// 이전에 받아온 키 삭제
+		// 키 삭제
 		map.remove("SEQ");
 		map.remove("MEMBER_NO");
 		map.remove("TITLE");
@@ -458,9 +460,8 @@ var email = $$("email").getValue();
 			}
 		}
     }
-“`
 
-“`  
+    
     // url 프로퍼티를 eventUrl의 href 속성으로 등록하여 클릭할 경우 해당 글의 수정페이지로 이동하게 한다.
     $('#eventUrl').attr('href',event.url);
 
@@ -523,21 +524,21 @@ var email = $$("email").getValue();
 	}
     “`
 
-    “`
-        <update id="deleteSample" parameterType="hashMap">
-        update SAMPLE
-        set DELETE_AT = 'Y'
-        where SEQ = #{seq,jdbcType=INTEGER}
-        </update>
-    “`
+        “`
+            <update id="deleteSample" parameterType="hashMap">
+            update SAMPLE
+            set DELETE_AT = 'Y'
+            where SEQ = #{seq,jdbcType=INTEGER}
+            </update>
+        “`
 
-    ## 캘린더 메뉴
-    사이드바에서 캘린더 메뉴로 들어가면 모든 일정 조회를 캘린더 화면으로 받아볼 수 있다
-    <ul>
-        <li>일정 목록 조회조건이랑 똑같으며 일정 데이터를 달력 화면에서 조회해서 볼 수 있다.</li>
-    </ul>
+## 캘린더 메뉴
+사이드바에서 캘린더 메뉴로 들어가면 모든 일정 조회를 캘린더 화면으로 받아볼 수 있다
+<ul>
+    <li>일정 목록 조회조건이랑 똑같으며 일정 데이터를 달력 화면에서 조회해서 볼 수 있다.</li>
+</ul>
 
-   ![캘린더조회](./img/스케줄러-캘린더조회.png)
+![캘린더조회](./img/스케줄러-캘린더조회.png)
 
    ## 내 일정
    내 일정만 조회해서 화면에 달력형태로 데이터를 보여준다
@@ -545,7 +546,7 @@ var email = $$("email").getValue();
         <li>내가 등록한 일정이랑 타인의 일정중 내가 참여하는 일정 데이터를 달력화면으로 보여준다</li>
     </ul>
 
-    ![내일정](./img/스케줄러-내일정.png)
+![내일정](./img/스케줄러-내일정.png)
 
     “`
         <!-- 두개의 쿼리를 union을 사용하여 조합한 결과를 중복된 데이터 없이 보여준다 -->
