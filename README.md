@@ -521,15 +521,14 @@
 		
 		return resultMap;
 	}
-    “`
 
-        “`
-            <update id="deleteSample" parameterType="hashMap">
-            update SAMPLE
-            set DELETE_AT = 'Y'
-            where SEQ = #{seq,jdbcType=INTEGER}
-            </update>
-        “`
+
+    // 쿼리 부분
+    <update id="deleteSample" parameterType="hashMap">
+    update SAMPLE
+    set DELETE_AT = 'Y'
+    where SEQ = #{seq,jdbcType=INTEGER}
+    </update>
 
 ## 캘린더 메뉴
 사이드바에서 캘린더 메뉴로 들어가면 모든 일정 조회를 캘린더 화면으로 받아볼 수 있다
@@ -567,4 +566,3 @@
                                 where MEMBER_NO = #{memberNo}
                             );
         </select>
-    “`
