@@ -78,52 +78,51 @@
 					return;
 				}
  
-    위의 코드에 정의된 spaceCheck와 memberValidation 메서드
- 
-    // 공백여부 체크
-    function spaceCheck(obj, objName, comment) {
-        if(obj == null || obj == "" || obj.length == 0){
-            alert(comment);
-            $$(objName).focus();
-            return 0;
+        위의 코드에 정의된 spaceCheck와 memberValidation 메서드
+    
+        // 공백여부 체크
+        function spaceCheck(obj, objName, comment) {
+            if(obj == null || obj == "" || obj.length == 0){
+                alert(comment);
+                $$(objName).focus();
+                return 0;
+            }
+            return 1;
         }
-        return 1;
-    }
 
-    // 회원정보 벨리데이션 체크
-    function memberValidation (param) {
-        /*
-        * member param 정보
-            param.name = name;
-            param.email = email;
-            param.pwd = pwd;
-            param.gender = gender;
-            param.dept = dept;
-            param.classes = classes;
-        */
-        
-        // 이메일, 이름, 비밀번호의 벨리데이션 체크에 필요한 정규식 표현들
-        var emailRegex = RegExp("^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\\.[a-zA-Z]{2,3}$");
-        var nameRegex = RegExp("^[가-힣a-zA-Z]{2,10}$");
-        var pwdRegex = RegExp("^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!~`@#&$%^*()\\-_=+\\\\\\|\\[\\]{};:\\'\"<>\\/?]).{8,16}$"); // 영문 + 숫자 + 특수문자(_ 는 제외) 조합으로 8자 이상 16자 이하로 조합하여야 한다
-        
-        if (regexCheck(emailRegex, param.email, "이메일 형식이 올바르지 않습니다.") == 0) return true;
-        if (regexCheck(nameRegex, param.name, "이름은 2~10글자 내외로 한글, 영문만 입력가능합니다.") == 0) return true;
-        if (regexCheck(pwdRegex, param.pwd, "비밀번호는 8~16글자 내외로 문자, 숫자, 특수문자를 조합하여 등록하세요.") == 0) return true;
-        
-        return false;
-    }
-
-    // 정규식 표현 체크를 위한 메서드
-    function regexCheck (regex, obj, comment) {
-        if (!regex.test(obj)) {
-            alert (comment);
-            return 0;
+        // 회원정보 벨리데이션 체크
+        function memberValidation (param) {
+            /*
+            * member param 정보
+                param.name = name;
+                param.email = email;
+                param.pwd = pwd;
+                param.gender = gender;
+                param.dept = dept;
+                param.classes = classes;
+            */
+            
+            // 이메일, 이름, 비밀번호의 벨리데이션 체크에 필요한 정규식 표현들
+            var emailRegex = RegExp("^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\\.[a-zA-Z]{2,3}$");
+            var nameRegex = RegExp("^[가-힣a-zA-Z]{2,10}$");
+            var pwdRegex = RegExp("^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!~`@#&$%^*()\\-_=+\\\\\\|\\[\\]{};:\\'\"<>\\/?]).{8,16}$"); // 영문 + 숫자 + 특수문자(_ 는 제외) 조합으로 8자 이상 16자 이하로 조합하여야 한다
+            
+            if (regexCheck(emailRegex, param.email, "이메일 형식이 올바르지 않습니다.") == 0) return true;
+            if (regexCheck(nameRegex, param.name, "이름은 2~10글자 내외로 한글, 영문만 입력가능합니다.") == 0) return true;
+            if (regexCheck(pwdRegex, param.pwd, "비밀번호는 8~16글자 내외로 문자, 숫자, 특수문자를 조합하여 등록하세요.") == 0) return true;
+            
+            return false;
         }
-        
-        return 1;
-    }
- “`
+
+        // 정규식 표현 체크를 위한 메서드
+        function regexCheck (regex, obj, comment) {
+            if (!regex.test(obj)) {
+                alert (comment);
+                return 0;
+            }
+            
+            return 1;
+        }
 
 ## 로그인
 이메일과 비밀번호 조회결과를 체크합니다.
@@ -132,6 +131,7 @@
     <li>로그인 정보가 db정보와 일치하지 않는다면 아이디가 틀렸는지 비밀번호가 틀렸는지의 경우를 따로 알려줍니다.</li>
     <li>로그인을 하지 않을경우 로그인 페이지와 회원가입 페이지 이외의 서비스를 이용할 수 없게 하였습니다.</li>
 </ul>
+
 ![로그인](./img/스케줄러-로그인.png)
 
 ## 일정 목록
@@ -139,6 +139,7 @@
 <ul>
     <li>화면에서 설정한 타입별로 데이터를 조회하도록 마이바티스에서 쿼리를 정의하였습니다.</li>
 </ul>
+
 ![일정목록](./img/스케줄러-일정목록.png)
 
     “`
@@ -181,6 +182,7 @@
     <li>일정명, 내용, 일정 종류, 시작일, 종료일, 일정을 같이하는 멤버를 등록합니다.</li>
     <li>정보 입력이 누락될 경우를 대비하여 일정을 같이하는 멤버의 정보 이외의 정보들은 공백일 경우 일정등록을 못하게 하였습니다.</li>
   </ul>
+
 ![일정등록](./img/스케줄러-일정등록.png)
 ![멤버조회](./img/스케줄러-멤버조회.png)
 
@@ -218,9 +220,8 @@
 
     // webix의 id명을 매개변수로 입력받아서 객체값의 좌우 여백을 없애주는 메서드
     function trim(objName) {
-	return $.trim($$(objName).getValue());
-}
-“`
+	    return $.trim($$(objName).getValue());
+    }
 
 ##일정 수정
 일정 정보를 수정하고 일정등록 조건과 같은 벨리데이션 체크를 한다.
@@ -405,7 +406,6 @@
             }
         });
     }
-“`
 
  ##일정 상세정보
  일정 정보를 보여준다
@@ -489,7 +489,6 @@
             }
         });
     }
-“`
 
 ## 일정 삭제
 일정 pk를 서버에 전달하여 데이터를 삭제한다
