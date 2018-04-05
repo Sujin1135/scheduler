@@ -7,7 +7,7 @@
 <script src="${pageContext.request.contextPath}/resources/jquery/jquery-3.3.1.min.js" type="text/javascript"></script>
 <script src="${pageContext.request.contextPath}/resources/main.js?ver=14"></script>
 
-<link href="${pageContext.request.contextPath}/resources/main.css?ver=36" rel="stylesheet" type="text/css" />
+<link href="${pageContext.request.contextPath}/resources/main.css?ver=38" rel="stylesheet" type="text/css" />
 <link rel="shorcut icon" href="${pageContext.request.contextPath}/resources/img/favicon.ico" />
 
 <!-- 합쳐지고 최소화된 최신 CSS -->

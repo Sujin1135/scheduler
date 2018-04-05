@@ -39,21 +39,18 @@
   </select>
   
   <select id="mySamples" parameterType="hashmap" resultType="hashmap">
-  	select SEQ, TITLE, M.NO, CONTENT, TYPE, START_DATE, END_DATE, M.NAME, MEMBER_NO
-	from SAMPLE
-	left join MEMBER as M
-	on MEMBER_NO = M.NO
-	where MEMBER_NO = #{memberNo}
+  	select s.SEQ, m2.NAME, s.TITLE, m.NO, s.CONTENT, s.TYPE, s.START_DATE, s.END_DATE
+  	from SAMPLE s
+	join SAMPLEPARTY sp on s.seq = sp.sample_seq
+	join MEMBER m on sp.member_no = m.no
+	join MEMBER m2 on s.member_no = m2.no
+	where m.no = #{memberNo}
+	and s.delete_at = 'N'
 	union
-	select S.SEQ, S.TITLE, M.NO, S.CONTENT, S.TYPE, S.START_DATE, S.END_DATE, M.NAME, S.MEMBER_NO
-	from SAMPLEPARTY as P
-	left join SAMPLE as S
-	on P.MEMBER_NO = S.MEMBER_NO
-	left join MEMBER as M
-	on P.MEMBER_NO = M.NO
-	where SAMPLE_SEQ in (select SAMPLE_SEQ
-							from SAMPLEPARTY
-                            where MEMBER_NO = #{memberNo}
-                            );
+	select s.SEQ, m.NAME,s.TITLE, m.NO, s.CONTENT, s.TYPE, s.START_DATE, s.END_DATE 
+	from sample s
+	join MEMBER m on s.member_no = m.no
+	where m.no = #{memberNo}
+	and s.delete_at = 'N'
   </select>
 </mapper>

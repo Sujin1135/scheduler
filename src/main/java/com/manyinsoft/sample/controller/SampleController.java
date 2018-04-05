@@ -1,6 +1,5 @@
 package com.manyinsoft.sample.controller;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manyinsoft.sample.service.SampleService;
 
 @Controller

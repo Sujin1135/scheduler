@@ -282,6 +282,7 @@ function setCalendar (data, contextPath, memberNo) {
 	}
 }
 
+// 일정 삭제 메서드
 function scheduleDelete (seq, contextPath, memberNo) {
 	var param = {};
 	param.seq = seq;
