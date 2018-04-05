@@ -7,7 +7,7 @@
 	<head>
 		<jsp:include page="../head/head.jsp" />
 		
-		<title>로그인</title>
+		<title>스케줄러 - 로그인</title>
 		
 		<script type="text/javascript">
 			function doSubmit() {

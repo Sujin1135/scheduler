@@ -8,7 +8,7 @@
 	<head>
 		<jsp:include page="../head/head.jsp" />
 		
-		<title>회원정보 관리</title>
+		<title>스케줄러 - 회원정보 관리</title>
 		
 		<script type="text/javascript">
 			function doSubmit() {

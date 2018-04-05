@@ -9,7 +9,7 @@
 		<script src="${pageContext.request.contextPath}/resources/fullcalendar-3.9.0/lib/moment.min.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/fullcalendar-3.9.0/fullcalendar.min.js"></script>
 		
-		<title>Insert title here</title>
+		<title>스케줄러 - 캘린더 조회</title>
 		
 		<script>
 			function doSubmit() {

@@ -4,7 +4,7 @@
 <head>
 <jsp:include page="../head/head.jsp" />
 
-<title>스케쥴러 - 조회</title>
+<title>스케쥴러 - 일정목록</title>
 
 <script type="text/javascript">
 

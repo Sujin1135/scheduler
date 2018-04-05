@@ -7,7 +7,7 @@
 <head>
 <jsp:include page="../head/head.jsp" />
 
-<title>sample create</title>
+<title>스케줄러 - 일정생성</title>
 
 <script type="text/javascript">
 var addMemberArr = new Array();

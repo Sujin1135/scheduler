@@ -4,7 +4,7 @@
 <head>
 <jsp:include page="../head/head.jsp" />
 
-<title>sample list</title>
+<title>스케줄러 - 일정수정</title>
 
 
 <script type="text/javascript">
