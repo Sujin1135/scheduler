@@ -16,6 +16,51 @@
 ![풀캘린더jsp](./img/스케줄러-풀캘린더jsp.png)
 ![풀캘린더js](./img/스케줄러-풀캘린더js.png)
 
+## 댓글
+댓글과 대댓글을 등록하고 목록을 보여주는 화면을 일정 상세정보 창에 보여준다.
+<ul>
+    <li>댓글과 대댓글 조회, 등록, 수정, 삭제를 할 수 있고 댓글과 대댓글은 depth 칼럼으로 구분한다.</li>
+    <li>대댓글에는 답글을 달 수 없게 하였다.</li>
+    <li>삭제와 수정의 경우에는 글쓴이와 로그인한 사용자의 정보가 일치할 경우에만 수정 삭제 버튼이 보이고 컨트롤러에서 사용자와 글쓴이의 일치관계를 한번 더 재확인한다.</li>
+</ul>
+![댓글](./img/스케줄러-댓글.png)
+    // 세션에 저장된 사용자의 pk
+    int sessionMember = Integer.parseInt(session.getAttribute("member").toString());
+    // 파라미터로 넘어온 글쓴이의 pk
+    int memberNo = Integer.parseInt(requestParam.get("memberNo").toString());
+    // 사용자와 글쓴이의 pk가 일치하지 않을경우
+    if (sessionMember != memberNo) throw new NullPointerException("잘못된 접근입니다.");
+
+
+    /*
+    * 댓글 조회 쿼리문
+    * GROUP_NO = 댓글의 순서이다 GROUP_NO가 같은 수일 경우 하나의 댓글과 하나 이상의 대댓글이다.
+    * DEPTH = 0이면 댓글 1이면 대댓글이다.
+    */
+    <select id="replyList" parameterType="int" resultType="hashMap">
+	  	select SEQ, m.NAME, SAMPLE_SEQ, COMMENT, CRE_DATE, DEPTH, PARENT_REPLYS_NO, GROUP_NO, MEMBER_NO
+	  	from REPLYS as r
+	  	left join MEMBER as m
+	  	on r.MEMBER_NO = m.NO
+	  	where SAMPLE_SEQ = #{seq, jdbcType=INTEGER}
+	  	and DELETE_AT = 'N'
+	  	order by GROUP_NO, DEPTH
+	</select>
+
+    /*
+    * 댓글일 경우와 대댓글일 경우 댓글 등록시 등록해야 하는 값이 다르므로 depth의 값에따라 다른 쿼리문을 처리한다.
+    */
+    <insert id="addReply" parameterType="hashMap">
+		insert into REPLYS(MEMBER_NO, SAMPLE_SEQ, COMMENT, CRE_DATE, DEPTH, PARENT_REPLYS_NO, GROUP_NO, DELETE_AT)
+		<choose>
+			<when test="depth == 0">
+				values (#{memberNo}, #{sample_seq}, #{comment}, now(), #{depth}, null, (select ifnull(max(r.GROUP_NO),0) +1 from REPLYS as r), 'N')
+			</when>
+			<otherwise>
+				values (#{memberNo}, #{sample_seq}, #{comment}, now(), #{depth}, #{parentNo}, #{groupNo}, 'N')
+			</otherwise>
+		</choose>
+	</insert>
 
 ## 회원가입
 회원가입시 해야하는 기본적인 벨리데이션 체크를 하였습니다.
@@ -540,22 +585,16 @@
 
 ![내일정](./img/스케줄러-내일정.png)
 
-        <!-- 두개의 쿼리를 union을 사용하여 조합한 결과를 중복된 데이터 없이 보여준다 -->
-        <select id="mySamples" parameterType="hashmap" resultType="hashmap">
-        select SEQ, TITLE, M.NO, CONTENT, TYPE, START_DATE, END_DATE, M.NAME, MEMBER_NO
-        from SAMPLE
-        left join MEMBER as M
-        on MEMBER_NO = M.NO
-        where MEMBER_NO = #{memberNo}
+        select s.SEQ, m2.NAME, s.TITLE, m.NO, s.CONTENT, s.TYPE, s.START_DATE, s.END_DATE
+        from SAMPLE s
+        join SAMPLEPARTY sp on s.seq = sp.sample_seq
+        join MEMBER m on sp.member_no = m.no
+        join MEMBER m2 on s.member_no = m2.no
+        where m.no = #{memberNo}
+        and s.delete_at = 'N'
         union
-        select S.SEQ, S.TITLE, M.NO, S.CONTENT, S.TYPE, S.START_DATE, S.END_DATE, M.NAME, S.MEMBER_NO
-        from SAMPLEPARTY as P
-        left join SAMPLE as S
-        on P.MEMBER_NO = S.MEMBER_NO
-        left join MEMBER as M
-        on P.MEMBER_NO = M.NO
-        where SAMPLE_SEQ in (select SAMPLE_SEQ
-                                from SAMPLEPARTY
-                                where MEMBER_NO = #{memberNo}
-                            );
-        </select>
+        select s.SEQ, m.NAME,s.TITLE, m.NO, s.CONTENT, s.TYPE, s.START_DATE, s.END_DATE 
+        from sample s
+        join MEMBER m on s.member_no = m.no
+        where m.no = #{memberNo}
+        and s.delete_at = 'N'
