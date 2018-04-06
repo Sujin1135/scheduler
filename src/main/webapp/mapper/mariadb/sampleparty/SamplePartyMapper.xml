@@ -38,18 +38,30 @@
   	where MEMBER_NO = #{value}
   </select>
   
+  <!-- union을 사용하여 두 select의 결과값을 중복 없이 더한 값을 리턴한다 -->
   <select id="mySamples" parameterType="hashmap" resultType="hashmap">
   	select s.SEQ, m2.NAME, s.TITLE, m.NO, s.CONTENT, s.TYPE, s.START_DATE, s.END_DATE
+  	<!-- sample 테이블과 sampleparty 테이블을 조인한다 -->
   	from SAMPLE s
 	join SAMPLEPARTY sp on s.seq = sp.sample_seq
+	
+	<!-- member 테이블과 sampleparty 테이블을 조인한다 -->
 	join MEMBER m on sp.member_no = m.no
+	
+	<!-- member 테이블과 sample 테이블을 조인한다 -->
 	join MEMBER m2 on s.member_no = m2.no
+	
+	<!-- sampleparty와 연결된 member 테이블의 pk와 같은 값을가진 테이블을 조회한다 -->
 	where m.no = #{memberNo}
 	and s.delete_at = 'N'
+	
 	union
-	select s.SEQ, m.NAME,s.TITLE, m.NO, s.CONTENT, s.TYPE, s.START_DATE, s.END_DATE 
+	select s.SEQ, m.NAME,s.TITLE, m.NO, s.CONTENT, s.TYPE, s.START_DATE, s.END_DATE
+	<!-- sample테이블과 member테이블을 조인한다 -->
 	from sample s
 	join MEMBER m on s.member_no = m.no
+	
+	<!-- sample테이블과 조인된 member의 pk와 같은값을 가진 테이블을 조회한다. -->
 	where m.no = #{memberNo}
 	and s.delete_at = 'N'
   </select>

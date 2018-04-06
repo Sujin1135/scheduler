@@ -209,8 +209,71 @@ public class SampleController {
 	
 	// 해당 일정에 참여하는 멤버조회
 	@ResponseBody
-	@RequestMapping(value = "/sample/partyMember.do", method= RequestMethod.POST)
+	@RequestMapping(value = "/sample/partyMember.do", method = RequestMethod.POST)
 	public List<HashMap<String, Object>> selectPartyMember (@RequestParam("no") int no) {
 		return sampleService.selectPartyMember(no);
+	}
+	
+	// 댓글 목록
+	@ResponseBody
+	@RequestMapping(value = "/sample/replyList.do", method = RequestMethod.POST)
+	public List<HashMap<String, Object>> replyList (@RequestParam("seq") int seq) {
+		System.out.println(seq);
+		return sampleService.replyList(seq);
+	}
+	
+	// 댓글 등록
+	@ResponseBody
+	@RequestMapping(value = "/sample/addReply.do", method = RequestMethod.POST)
+	public HashMap<String, Object> addReply (@RequestParam HashMap<String, Object> requestParam) {
+		// 결과정보를 반환할 맵
+		HashMap<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			sampleService.addReply(requestParam);
+			resultMap.put("result", "SUCCESS");
+		} catch (NullPointerException e) {
+			resultMap.put("result", "FAIL");
+			resultMap.put("errMsg", e.getMessage());
+		}
+		return resultMap;
+	}
+	
+	// 댓글 수정
+	@ResponseBody
+	@RequestMapping(value = "/sample/updateReply.do", method = RequestMethod.POST)
+	public HashMap<String, Object> updateReply (@RequestParam HashMap<String, Object> requestParam) {
+		// 결과정보를 반환할 맵
+		HashMap<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			sampleService.updateReply(requestParam);
+			resultMap.put("result", "SUCCESS");
+		} catch (NullPointerException e) {
+			resultMap.put("result", e.getMessage());
+		}
+		
+		return resultMap;
+	}
+	
+	// 댓글 삭제
+	@ResponseBody
+	@RequestMapping(value = "/sample/deleteReply.do", method = RequestMethod.POST)
+	public HashMap<String, Object> deleteReply (@RequestParam HashMap<String, Object> requestParam) {
+		// 결과정보를 반환할 맵
+		HashMap<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			int sessionMember = Integer.parseInt(session.getAttribute("member").toString());
+			int memberNo = Integer.parseInt(requestParam.get("memberNo").toString());
+			
+			if (sessionMember != memberNo) throw new NullPointerException("잘못된 접근입니다.");
+			
+			int seq = Integer.parseInt(requestParam.get("seq").toString());
+			sampleService.deleteReply(seq);
+			resultMap.put("result", "SUCCESS");
+		} catch (NullPointerException e) {
+			resultMap.put("result", "FAIL");
+			resultMap.put("errMsg", e.getMessage());
+		}
+		
+		return resultMap;
 	}
 }

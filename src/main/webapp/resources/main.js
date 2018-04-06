@@ -186,7 +186,7 @@ function primaryKeyCheck (memberNo, sampleNo, addMemberArr, deleteMemberArr) {
 }
 
 //풀캘린더 세팅
-function setCalendar (data, contextPath, memberNo) {
+function setCalendar (data, contextPath, memberNo, seq) {
 	if (data.length != 0) {
 		$("#calendar").fullCalendar({
 			header: {
@@ -252,6 +252,8 @@ function setCalendar (data, contextPath, memberNo) {
 					}
 				});
 				
+				replysList(event.id, contextPath, memberNo);
+				
 				if (event.type == 1) {
 					$(".modal-header").css("background-color", "#00bfff");
 				} else if (event.type == 2) {
@@ -271,8 +273,20 @@ function setCalendar (data, contextPath, memberNo) {
 	            $("#addMember").html('<i class="fa fa-address-book-o" style="margin-right: 15px;"> 일정 참여멤버</i>');
 	            $('#fullCalModal').modal();
 	            
+            	$("#reply-button").click(function() {
+            		// seq, memberNo, contextPath, depth, parentNo, groupNo
+					createReplys(event.id, event.memberNo, $("#reply-input").val(), contextPath, 0);
+				});
+	            
 	            $('.delete-button').click(function() {
 	            	scheduleDelete(event.id, contextPath, memberNo);
+	            });
+	            
+	            $('#reply-input').keydown(function(key) {
+	            	if (key.keyCode == 13) {
+	            		createReplys(event.id, event.memberNo, $("#reply-input").val(), contextPath, 0);
+	            		$("#reply-input").val('');
+	            	}
 	            });
 	            return false;
 			}
@@ -305,4 +319,224 @@ function scheduleDelete (seq, contextPath, memberNo) {
 			alert(data.responseText);
 		}
 	});
+}
+
+// 댓글목록
+function replysList (seq, contextPath, memberNo) {
+	
+	$.ajax({
+		url: contextPath + "/sample/replyList.do",
+		type: "POST",
+		data: {"seq": seq},
+		dataType: "json",
+		success: function(data) {
+			$("#reply-list").empty();
+			if (data != null) {
+				for (var i =0; i < data.length; i++) {
+					var replySeq = data[i].SEQ;
+					var groupNo = data[i].GROUP_NO;
+					var parentNo = data[i].PARENT_REPLYS_NO;
+					
+					// 날짜를 yyyy-MM-dd 형식으로 포맷한다
+					var date = new Date(data[i].CRE_DATE).toISOString().split('T')[0];
+					data[i].CRE_DATE = date;
+					createReply(data[i], contextPath, memberNo);
+					
+					// 댓글 등록자와 사용자가 일치하지 않을 경우 댓글 수정, 삭제 아이콘을 숨긴다.
+					if (data[i].MEMBER_NO != memberNo) {
+						$(".reply-update"+ replySeq).css("display", "none");
+						$(".reply-remove"+ replySeq).css("display", "none");
+					}
+					
+					// 대댓글일 경우
+					if (data[i].DEPTH != 0) {
+						$(".reply-reply"+ replySeq).css("display", "none");
+						$(".reply"+ replySeq).css("background-color", "#C0C0C0");
+						$(".reply"+ replySeq).css("border-radius", "15px");
+					}
+				}
+			} else {
+				$("#reply-list").html("등록된 댓글이 없습니다.");
+			}
+		},
+		error: function(data) {
+			alert(data.responseText);
+		}
+	});
+}
+
+// 댓글등록
+function createReplys (seq, memberNo, comment, contextPath, depth, parentNo, groupNo) {
+	var param = {};
+	param.sample_seq = seq;
+	param.memberNo = memberNo;
+	param.depth = depth;
+	param.comment = comment
+	if (parentNo != null) {
+		param.parentNo = parentNo;
+		param.groupNo = groupNo;
+	}
+	
+	// 댓글 조회 비동기 통신
+	$.ajax({
+		url: contextPath + "/sample/addReply.do",
+		type: "POST",
+		data: param,
+		dataType: "json",
+		success: function(data) {
+			// 댓글목록 div창을 비운 후 댓글 리스트 출력 메서드를 재호출한다.
+			if (data.result == "SUCCESS") {
+				alert("댓글이 등록되었습니다.");
+				$("#reply-list").empty();
+				replysList(seq, contextPath, memberNo);
+			} else {
+				alert (data.errMsg);
+			}
+		},
+		error: function(data) {
+			alert(data.responseText);
+		}
+	});
+}
+
+// 댓글 수정
+function updateReplys (seq, sampleSeq, comment, contextPath, memberNo) {
+	var param = {};
+	param.seq = seq;
+	param.comment = comment;
+	
+	$.ajax({
+		url: contextPath+ "/sample/updateReply.do",
+		type: "POST",
+		data: param,
+		dataType: "json",
+		success: function(data) {
+			var cancelButton = $(".uCancel-button"+ seq);
+			resultCheck(data, "댓글이 수정되었습니다.");
+			replysList(sampleSeq, contextPath, memberNo);
+		},
+		error: function(data) {
+			alert(data.responseText);
+		}
+	});
+}
+
+// 댓글 삭제
+function deleteReplys (seq, sampleSeq, contextPath, memberNo) {
+	console.log(seq);
+	var param = {};
+	param.seq = seq;
+	param.memberNo = memberNo;
+	
+	$.ajax({
+		url: contextPath+ "/sample/deleteReply.do",
+		type: "POST",
+		data: param,
+		dataType: "json",
+		success: function(data) {
+			resultCheck(data, "댓글이 삭제되었습니다.");
+			replysList(sampleSeq, contextPath, memberNo);
+		},
+		error: function(data) {
+			alert(data.responseText);
+		}
+	});
+}
+
+// ajax 요청의 성공 실패여부에 따른 간단한 alert메세지
+function resultCheck (data, comment) {
+	if (data.result == "SUCCESS") {
+		alert(comment);
+	} else {
+		alert(data.errMsg);
+	}
+}
+
+// 댓글 엘리먼트 생성 메서드
+function createReply(data, contextPath, memberNo) {
+	$("#reply-list").append(
+			"<div class='reply"+ data.SEQ +"'"
+			+ "data-groupNo='"+ data.GROUP_NO +"' "
+			+ "data-memberNo='"+ data.MEMBER_NO +"'"
+			+ "style='padding-left:" + 2 * data.DEPTH + "em'>"
+			+ "<div style='justify-content: space-around;'> <span class='reply-member'>" + data.NAME + "</span>"
+			+ "<span class='reply-date'>" + data.CRE_DATE + "</span> "
+			+ "<i class='fa fa-reply cursor-pointer reply-reply"+ data.SEQ +"'></i>"
+			+ "<i class='glyphicon glyphicon-pencil cursor-pointer update-button"+ data.SEQ +"'></i> "
+			+ "<i class='glyphicon glyphicon-remove cursor-pointer reply-remove"+ data.SEQ +"'></i> </div>"
+			+ "<div style='margin-top: 20px;'><p class='reply-comment"+ data.SEQ +"'>" + data.COMMENT + "</p></div>"
+			+ "<div class='reply-update"+ data.SEQ +"'></div>"
+			+ "<div class='reply-add"+ data.SEQ +"'></div>"
+			+ "</div>");
+	
+	// 댓글 삭제버튼 이벤트 등록
+	$(".reply-remove"+ data.SEQ).click(function() {
+		// deleteReplys (seq, memberNo, contextPath)
+		deleteReplys(data.SEQ, data.SAMPLE_SEQ, contextPath, memberNo)
+	});
+	
+	// 댓글 수정버튼 이벤트 등록
+	$(".update-button"+ data.SEQ).click(function() {
+		// 댓글 내용을 안보이게 한다
+		$(".reply-comment"+ data.SEQ).css("display", "none");
+		$(".reply-update"+ data.SEQ).html(
+				"<div>"
+				+ "<input type='text' class='form-control update-input"+ data.SEQ +"' style='width: 50%; height:27px;" +
+						" margin-bottom: 10px; display:inline' value='"+ data.COMMENT +"' placeholder='댓글을 입력해주세요.'>"
+				+ "<button class='btn btn-info rUpdate-button"+ data.SEQ +"' style='width:20% display:inline'>등록</button>"
+				+ "<button class='btn btn-default uCancel-button"+ data.SEQ +"'>취소</button>"
+				+ "</div>"
+		);
+		
+		// 댓글수정 엔터 이벤트
+		$(".update-input"+ data.SEQ).keydown(function(key) {
+			if (key.keyCode == 13) {
+				updateReplys(data.SEQ, data.SAMPLE_SEQ, $(".update-input"+ data.SEQ).val(), contextPath, memberNo);
+			}
+		});
+		
+		// 댓글수정 등록버튼 이벤트
+		$(".rUpdate-button"+ data.SEQ).click(function() {
+			updateReplys(data.SEQ, data.SAMPLE_SEQ, $(".update-input"+ data.SEQ).val(), contextPath, memberNo);
+		});
+		
+		// 댓글수정 닫기버튼 이벤트
+		$(".uCancel-button"+ data.SEQ).click(function() {
+			$(".reply-comment"+ data.SEQ).css("display", "block");
+			$(".reply-update"+ data.SEQ).empty();
+		});
+	});
+	
+	// 댓글일 경우, depth가 0이면 댓글 1이면 대댓글이다.
+	if (data.DEPTH == 0) {
+		// 대댓글 등록 엘리먼트 생성
+		$(".reply-reply"+ data.SEQ).click(function() {
+			$(".reply-add"+ data.SEQ).html(
+					"<div>"
+					+ "<input type='text' class='form-control add-input"+ data.SEQ +"' style='width: 50%; height:27px;" +
+							" margin-bottom: 10px; display:inline' placeholder='댓글을 입력해주세요.'>"
+					+ "<button class='btn btn-info add-button"+ data.SEQ +"' style='width:20% display:inline'>등록</button>"
+					+ "<button class='btn btn-default cancel-button"+ data.SEQ +"'>취소</button>"
+					+ "</div>"
+			);
+			// 대댓글 등록버튼
+			$(".add-button"+ data.SEQ).click(function() {
+				// (seq, memberNo, comment, contextPath, depth, parentNo, groupNo)
+				createReplys (data.SAMPLE_SEQ, data.MEMBER_NO, $(".add-input"+ data.SEQ).val(), contextPath,
+						data.DEPTH+1, data.SEQ, data.GROUP_NO);
+			});
+			
+			// 대댓글 입력창 닫기 이벤트
+			$(".cancel-button"+ data.SEQ).click(function() {
+				$(".reply-add"+ data.SEQ).empty();
+			});
+			
+			$(".add-input"+ data.SEQ).keydown(function(key) {
+				if (key.keyCode == 13) {
+					createReplys (data.SAMPLE_SEQ, data.MEMBER_NO, $(".add-input"+ data.SEQ).val(), contextPath,
+							data.DEPTH+1, data.SEQ, data.GROUP_NO);
+				}
+			});
+		});
+	}
 }

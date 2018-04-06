@@ -18,4 +18,12 @@ public interface SampleServiceImpl {
 	public int sampleMemberNo (int no);
 	
 	public List<HashMap<String, Object>> mySamples (HashMap<String, Object> param, String contextPath);
+
+	public List<HashMap<String, Object>> replyList (int no);
+	
+	public void addReply (HashMap<String, Object> param) throws NullPointerException;
+	
+	public void updateReply (HashMap<String, Object> param) throws NullPointerException;
+	
+	public void deleteReply (int no) throws NullPointerException;
 }

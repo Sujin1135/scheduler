@@ -176,4 +176,30 @@ public class SampleService implements SampleServiceImpl {
 			}
 		}
 	}
+	
+	// 댓글 목록
+	public List<HashMap<String, Object>> replyList (int no) {
+		return sampleDao.replyList(no);
+	}
+	
+	// 댓글 추가
+	public void addReply (HashMap<String, Object> param) throws NullPointerException {
+		int result = sampleDao.addReply(param);
+		
+		if (result == 0) throw new NullPointerException("댓글이 등록되지 않았습니다.");
+	}
+	
+	// 댓글 수정
+	public void updateReply (HashMap<String, Object> param) throws NullPointerException {
+		int result = sampleDao.updateReply(param);
+		
+		if (result == 0) throw new NullPointerException("댓글이 수정되지 않았습니다.");
+	}
+	
+	// 댓글 삭제
+	public void deleteReply (int no) throws NullPointerException {
+		int result = sampleDao.deleteReply(no);
+		
+		if (result == 0) throw new NullPointerException("댓글이 삭제되지 않았습니다.");
+	}
 }

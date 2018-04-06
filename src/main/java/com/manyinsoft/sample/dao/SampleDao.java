@@ -62,4 +62,24 @@ public class SampleDao {
 	public List<HashMap<String, Object>> mySamples (HashMap<String, Object> hashMap) {
 		return sqlSession.selectList("com.manyinsoft.common.sql.SamplePartyMapper.mySamples", hashMap);
 	}
+	
+	// 댓글 목록
+	public List<HashMap<String, Object>> replyList (int no) {
+		return sqlSession.selectList("com.manyinsoft.common.sql.ReplysMapper.replyList", no);
+	}
+	
+	// 댓글 등록
+	public int addReply (HashMap<String, Object> hashMap) {
+		return sqlSession.insert("com.manyinsoft.common.sql.ReplysMapper.addReply", hashMap);
+	}
+	
+	// 댓글 수정
+	public int updateReply (HashMap<String, Object> hashMap) {
+		return sqlSession.update("com.manyinsoft.common.sql.ReplysMapper.updateReply", hashMap);
+	}
+	
+	// 댓글 삭제
+	public int deleteReply (int no) {
+		return sqlSession.update("com.manyinsoft.common.sql.ReplysMapper.deleteReply", no);
+	}
 }

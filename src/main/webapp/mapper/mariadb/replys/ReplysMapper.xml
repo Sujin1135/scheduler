@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.manyinsoft.common.sql.ReplysMapper">
+	<select id="replyList" parameterType="int" resultType="hashMap">
+	  	select SEQ, m.NAME, SAMPLE_SEQ, COMMENT, CRE_DATE, DEPTH, PARENT_REPLYS_NO, GROUP_NO, MEMBER_NO
+	  	from REPLYS as r
+	  	left join MEMBER as m
+	  	on r.MEMBER_NO = m.NO
+	  	where SAMPLE_SEQ = #{seq, jdbcType=INTEGER}
+	  	and DELETE_AT = 'N'
+	  	order by GROUP_NO, DEPTH
+	</select>
+	
+	<insert id="addReply" parameterType="hashMap">
+		insert into REPLYS(MEMBER_NO, SAMPLE_SEQ, COMMENT, CRE_DATE, DEPTH, PARENT_REPLYS_NO, GROUP_NO, DELETE_AT)
+		<choose>
+			<when test="depth == 0">
+				values (#{memberNo}, #{sample_seq}, #{comment}, now(), #{depth}, null, (select ifnull(max(r.GROUP_NO),0) +1 from REPLYS as r), 'N')
+			</when>
+			<otherwise>
+				values (#{memberNo}, #{sample_seq}, #{comment}, now(), #{depth}, #{parentNo}, #{groupNo}, 'N')
+			</otherwise>
+		</choose>
+	</insert>
+	
+	<update id="updateReply" parameterType="hashMap">
+		update REPLYS
+		<set>
+			COMMENT = #{comment, jdbcType=VARCHAR}
+		</set>
+		where SEQ = #{seq, jdbcType=INTEGER}
+	</update>
+	
+	<delete id="deleteReply" parameterType="int">
+		update REPLYS
+		<set>
+			DELETE_AT = 'Y'
+		</set>
+		where SEQ = #{seq, jdbcType=INTEGER}
+	</delete>
+</mapper>
