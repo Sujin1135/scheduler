@@ -107,7 +107,6 @@ public class SampleController {
 	public List<HashMap<String, Object>> mySamples (HttpServletRequest request, @RequestParam HashMap<String, Object> requestParam) {
 		String contextPath = request.getContextPath();
 		List<HashMap<String, Object>> sampleList = sampleService.mySamples(requestParam, contextPath);
-		System.out.println(sampleList);
 		return sampleList;
 	}
 	
@@ -218,7 +217,6 @@ public class SampleController {
 	@ResponseBody
 	@RequestMapping(value = "/sample/replyList.do", method = RequestMethod.POST)
 	public List<HashMap<String, Object>> replyList (@RequestParam("seq") int seq) {
-		System.out.println(seq);
 		return sampleService.replyList(seq);
 	}
 	
@@ -245,9 +243,17 @@ public class SampleController {
 		// 결과정보를 반환할 맵
 		HashMap<String, Object> resultMap = new HashMap<String, Object>();
 		try {
+			int sessionMember = Integer.parseInt(session.getAttribute("member").toString());
+			int memberNo = Integer.parseInt(requestParam.get("memberNo").toString());
+			
+			if (sessionMember != memberNo) {
+				throw new NullPointerException("잘못된 접근입니다.");
+			}
+			
 			sampleService.updateReply(requestParam);
 			resultMap.put("result", "SUCCESS");
 		} catch (NullPointerException e) {
+			e.printStackTrace();
 			resultMap.put("result", e.getMessage());
 		}
 		

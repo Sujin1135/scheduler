@@ -273,9 +273,10 @@ function setCalendar (data, contextPath, memberNo, seq) {
 	            $("#addMember").html('<i class="fa fa-address-book-o" style="margin-right: 15px;"> 일정 참여멤버</i>');
 	            $('#fullCalModal').modal();
 	            
+	            // 댓글 등록버튼 이벤트
             	$("#reply-button").click(function() {
             		// seq, memberNo, contextPath, depth, parentNo, groupNo
-					createReplys(event.id, event.memberNo, $("#reply-input").val(), contextPath, 0);
+					createReplys(event.id, memberNo, $("#reply-input").val(), contextPath, 0);
 				});
 	            
 	            $('.delete-button').click(function() {
@@ -284,7 +285,7 @@ function setCalendar (data, contextPath, memberNo, seq) {
 	            
 	            $('#reply-input').keydown(function(key) {
 	            	if (key.keyCode == 13) {
-	            		createReplys(event.id, event.memberNo, $("#reply-input").val(), contextPath, 0);
+	            		createReplys(event.id, memberNo, $("#reply-input").val(), contextPath, 0);
 	            		$("#reply-input").val('');
 	            	}
 	            });
@@ -371,11 +372,17 @@ function createReplys (seq, memberNo, comment, contextPath, depth, parentNo, gro
 	param.sample_seq = seq;
 	param.memberNo = memberNo;
 	param.depth = depth;
-	param.comment = comment
+	param.comment = comment;
 	if (parentNo != null) {
 		param.parentNo = parentNo;
 		param.groupNo = groupNo;
 	}
+	
+	// 댓글 벨리데이션 체크
+	if (replysCheck(param.comment) == 0) {
+		alert("댓글은 2글자 이상 50글자 이하로 등록해주세요.");
+		return;
+	} 
 	
 	// 댓글 조회 비동기 통신
 	$.ajax({
@@ -404,6 +411,13 @@ function updateReplys (seq, sampleSeq, comment, contextPath, memberNo) {
 	var param = {};
 	param.seq = seq;
 	param.comment = comment;
+	param.memberNo = memberNo;
+	
+	// 댓글 벨리데이션 체크
+	if (replysCheck(param.comment) == 0) {
+		alert("댓글은 2글자 이상 50글자 이하로 등록해주세요.");
+		return;
+	} 
 	
 	$.ajax({
 		url: contextPath+ "/sample/updateReply.do",
@@ -423,7 +437,6 @@ function updateReplys (seq, sampleSeq, comment, contextPath, memberNo) {
 
 // 댓글 삭제
 function deleteReplys (seq, sampleSeq, contextPath, memberNo) {
-	console.log(seq);
 	var param = {};
 	param.seq = seq;
 	param.memberNo = memberNo;
@@ -457,7 +470,7 @@ function createReply(data, contextPath, memberNo) {
 	$("#reply-list").append(
 			"<div class='reply"+ data.SEQ +"'"
 			+ "data-groupNo='"+ data.GROUP_NO +"' "
-			+ "data-memberNo='"+ data.MEMBER_NO +"'"
+			+ "data-memberNo='"+ memberNo +"'"
 			+ "style='padding-left:" + 2 * data.DEPTH + "em'>"
 			+ "<div style='justify-content: space-around;'> <span class='reply-member'>" + data.NAME + "</span>"
 			+ "<span class='reply-date'>" + data.CRE_DATE + "</span> "
@@ -472,7 +485,7 @@ function createReply(data, contextPath, memberNo) {
 	// 댓글 삭제버튼 이벤트 등록
 	$(".reply-remove"+ data.SEQ).click(function() {
 		// deleteReplys (seq, memberNo, contextPath)
-		deleteReplys(data.SEQ, data.SAMPLE_SEQ, contextPath, memberNo)
+		if (confirm("댓글을 삭제하시겠습니까?")) deleteReplys(data.SEQ, data.SAMPLE_SEQ, contextPath, memberNo)
 	});
 	
 	// 댓글 수정버튼 이벤트 등록
@@ -522,7 +535,7 @@ function createReply(data, contextPath, memberNo) {
 			// 대댓글 등록버튼
 			$(".add-button"+ data.SEQ).click(function() {
 				// (seq, memberNo, comment, contextPath, depth, parentNo, groupNo)
-				createReplys (data.SAMPLE_SEQ, data.MEMBER_NO, $(".add-input"+ data.SEQ).val(), contextPath,
+				createReplys (data.SAMPLE_SEQ, memberNo, $(".add-input"+ data.SEQ).val(), contextPath,
 						data.DEPTH+1, data.SEQ, data.GROUP_NO);
 			});
 			
@@ -531,12 +544,18 @@ function createReply(data, contextPath, memberNo) {
 				$(".reply-add"+ data.SEQ).empty();
 			});
 			
+			// 엔터키 입력 이벤트
 			$(".add-input"+ data.SEQ).keydown(function(key) {
 				if (key.keyCode == 13) {
-					createReplys (data.SAMPLE_SEQ, data.MEMBER_NO, $(".add-input"+ data.SEQ).val(), contextPath,
+					createReplys (data.SAMPLE_SEQ, memberNo, $(".add-input"+ data.SEQ).val(), contextPath,
 							data.DEPTH+1, data.SEQ, data.GROUP_NO);
 				}
 			});
 		});
 	}
+}
+
+function replysCheck(comment) {
+	if (comment.length > 1 && comment.length <= 50) return 1
+	return 0;
 }

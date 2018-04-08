@@ -22,7 +22,7 @@
   <update id="deleteMember" parameterType="hashMap">
   	update SAMPLEPARTY 
   	set DELETE_AT = 'Y'
-  	where SAMPLE_SEQ = #{SEQ, jdbcType=INTEGER}
+  	where SAMPLE_SEQ = #{seq, jdbcType=INTEGER}
   	<if test="memberNo != null">
   		and MEMBER_NO = #{memberNo, jdbcType=INTEGER}
   	</if>

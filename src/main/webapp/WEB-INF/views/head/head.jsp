@@ -5,7 +5,7 @@
 <link href="${pageContext.request.contextPath}/resources/webix/skins/compact.css" rel="stylesheet" type="text/css" />
 <script src="${pageContext.request.contextPath}/resources/webix/webix.js" type="text/javascript"></script>
 <script src="${pageContext.request.contextPath}/resources/jquery/jquery-3.3.1.min.js" type="text/javascript"></script>
-<script src="${pageContext.request.contextPath}/resources/main.js?ver=15"></script>
+<script src="${pageContext.request.contextPath}/resources/main.js?ver=21"></script>
 
 <link href="${pageContext.request.contextPath}/resources/main.css?ver=58" rel="stylesheet" type="text/css" />
 <link rel="shorcut icon" href="${pageContext.request.contextPath}/resources/img/favicon.ico" />
