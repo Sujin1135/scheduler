@@ -332,7 +332,7 @@ function replysList (seq, contextPath, memberNo) {
 		dataType: "json",
 		success: function(data) {
 			$("#reply-list").empty();
-			if (data != null) {
+			if (data.length != 0) {
 				for (var i =0; i < data.length; i++) {
 					var replySeq = data[i].SEQ;
 					var groupNo = data[i].GROUP_NO;
@@ -345,7 +345,7 @@ function replysList (seq, contextPath, memberNo) {
 					
 					// 댓글 등록자와 사용자가 일치하지 않을 경우 댓글 수정, 삭제 아이콘을 숨긴다.
 					if (data[i].MEMBER_NO != memberNo) {
-						$(".reply-update"+ replySeq).css("display", "none");
+						$(".update-button"+ replySeq).css("display", "none");
 						$(".reply-remove"+ replySeq).css("display", "none");
 					}
 					
@@ -556,6 +556,6 @@ function createReply(data, contextPath, memberNo) {
 }
 
 function replysCheck(comment) {
-	if (comment.length > 1 && comment.length <= 50) return 1
+	if (comment.length > 1 && comment.length < 51) return 1
 	return 0;
 }
