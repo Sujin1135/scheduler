@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.manyinsoft.sample.service.SampleService;
+import com.manyinsoft.sample.service.SampleServiceImpl;
 
 @Controller
 public class SampleController {
@@ -24,7 +24,7 @@ public class SampleController {
 	Logger logger = LoggerFactory.getLogger(SampleController.class);
 	
 	@Autowired
-	private SampleService sampleService;
+	private SampleServiceImpl sampleService;
 	
 	@Autowired
 	private HttpSession session;

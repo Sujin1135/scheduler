@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.manyinsoft.member.service.MemberService;
+import com.manyinsoft.member.service.MemberServiceImpl;
 
 @Controller
 public class MemberController {
-	MemberService memberService;
+	MemberServiceImpl memberService;
 	
 	@Autowired
-	public void setMemberService (MemberService memberService) {
+	public void setMemberService (MemberServiceImpl memberService) {
 		this.memberService = memberService;
 	}
 	
