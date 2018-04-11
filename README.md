@@ -23,7 +23,9 @@
     <li>대댓글에는 답글을 달 수 없게 하였다.</li>
     <li>삭제와 수정의 경우에는 글쓴이와 로그인한 사용자의 정보가 일치할 경우에만 수정 삭제 버튼이 보이고 컨트롤러에서 사용자와 글쓴이의 일치관계를 한번 더 재확인한다.</li>
 </ul>
+
 ![댓글](./img/스케줄러-댓글.png)
+
     // 세션에 저장된 사용자의 pk
     int sessionMember = Integer.parseInt(session.getAttribute("member").toString());
     // 파라미터로 넘어온 글쓴이의 pk
